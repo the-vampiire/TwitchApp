@@ -1,8 +1,7 @@
 // jQuery shortcuts
-    var online = $('#jumbotron_online'),
-        offline = $('#jumbotron_offline'),
-        channel_banner = $('.channel_banner'),
-        channel_logo = $('.channel_logo');
+    var online = $('#jumbotron_online');
+        // offline = $('#jumbotron_offline'),
+        // channel = $('.channel_banner');
 
 
 
@@ -10,7 +9,8 @@ var channel_names = ["ESL_SC2", "OgamingSC2", "cretetion", "freecodecamp", "stor
 var channel_ids = ["79776140", "30220059", "71852806", "90401618", "152475255", "6726509", "82534701", "54925078"];
 
 // Generic banner click function to display associated channel stream and chat
-channel_banner.click(function(){
+$('.channel_banner').on('click', (function(){
+    console.log('called', $(this));
     var id = $(this).attr('id');
     name = $(this).attr('name');
 
@@ -39,7 +39,59 @@ function convert_username(arr){
             success: function(data){
                 // callback the status and details request function
                 // passing the data (including ID) from this request
+
+                var user = data.users[0],
+                    id = user._id,
+                    name = user.name,
+                    logo = user.logo;
+
                 status_details(data);
+
+
+                online.append(
+                    
+
+                    '<a href="#content_'+id+'" data-toggle="collapse">'+
+                    '<div class="jumbotron channel_banner" id="banner_'+ id +
+                    '" name="' + name + '" style="height: 100px;">' +
+                    '<div class="channel_logo" id="logo_'+id+'"></div>' +
+                    '<div class="text-center" style="color:white; margin-top: 20px; left: 5px">' + name + '</div>' +
+                    '</div>'+
+                    '</a>'+
+                    '<div id="content_'+id+'" class="collapse">'+
+                    '<div style="margin-top: -20px">'+
+                    '<div class="jumbotron">'+
+                    '<iframe'+
+                'name = "stream"'+
+                'src=""'+
+                'height="300"'+
+                'width="100%"'+
+                'frameborder="0"'+
+                'scrolling="no"'+
+                'allowfullscreen="true">'+
+                    '</iframe>'+
+                    '</div>'+
+                    '<div class="jumbotron" style="margin-top: -20px">'+
+                    '<iframe'+
+                'name="chat"'+
+                'frameborder="0"'+
+                'scrolling="yes"'+
+                'id="chat_embed"'+
+                'src=""'+
+                'height="300"'+
+                'width="100%">'+
+                    '</iframe>'+
+                    '</div>'+
+                    '</div>'+
+                    '</div>'
+
+
+                );
+
+                var channel_logo = $('#logo_'+id);
+
+                channel_logo.css('background-image', 'url("'+logo+'")');
+
             }
         });
     }
@@ -62,6 +114,7 @@ function status_details(data) {
         },
 
         success: function (data) {
+
             // shortcut variables
             var stream = data.stream;
 
@@ -77,34 +130,20 @@ function status_details(data) {
                     views = channel.views,
                     preview_image = stream.preview.small;
 
-                online.append(
-                    '<div class="jumbotron channel_banner" style="height: 100px;">' +
-                    '<div class="channel_logo"></div>' +
-                    '<div class="text-center" style="color:white; margin-top: 20px; left: 5px">' + name + '</div>' +
-                    '</div>'
-                );
-
-                var channel_banner = $('.channel_banner');
-
-                channel_banner.attr('id', id);
-                    console.log(channel_banner.attr('id'));
-                channel_banner.attr('name', name);
-                    console.log(channel_banner.attr('name'));
-                $('#'+id).css('background-image', 'url("'+banner+'")');
 
 
+                var channel_banner = $('#banner_'+id),
+                channel_logo = $('#logo_'+id);
+
+
+                channel_banner.css('background-image', 'url("'+banner+'")');
+                channel_logo.css('background-image', 'url("")');
 
 
             }
             // if stream is offline / null returned
             else {
-                offline.css('display', 'block');
-                offline.append(
-                    '<div class="jumbotron channel_banner" style="height: 100px;">' +
-                    '<div class="channel_logo"></div>' +
-                    '<div class="text-center" style="color:white; margin-top: 20px; left: 5px">' + 'OFFLINE' + '</div>' +
-                    '</div>'
-                );
+
             }
 
         }
